@@ -19,29 +19,26 @@ LeeSinMenu.Harass:Boolean("useE", "Use E in combo", true)
 LeeSinMenu.Harass:Boolean("H", "Use Hydra", true)
 
 LeeSinMenu:Menu("Killsteal", "Killsteal")
-LeeSinMenu.Killsteal:Boolean("W", "Killsteal with W", true)
+LeeSinMenu.Killsteal:Boolean("E", "Killsteal with E", true)
 LeeSinMenu.Killsteal:Boolean("R", "Killsteal with R", true)
 
 LeeSinMenu:Menu("Misc", "Misc")
 if Ignite ~= nil then LeeSinMenu.Misc:Boolean("Autoignite", "Auto Ignite", true) end
 LeeSinMenuLeeSinMenu.Misc:Boolean("Autolvl", "Auto level", true)
 LeeSinMenu.Misc:DropDown("Autolvltable", "Priority", 1, {"Q-E-W", "Q-W-E", "E-Q-W"})
-LeeSinMenu.Misc:DropDown("cancel", "Cancel Animation", 1, {"Dance", "Taunt", "Laugh", "Joke", "Off"})
-LeeSinMenu.Misc:KeyBinding("Flee", "Flee", string.byte("T"))
 LeeSinMenu.Misc:KeyBinding("WallJump", "WallJump", string.byte("G"))
-LeeSinMenu.Misc:Boolean("AutoW", "Auto W", true)
-LeeSinMenu.Misc:Slider("AutoWCount", "if Enemies Around >", 3, 1, 5, 1)
+LeeSinMenu.Misc:Boolean("AutoE", "Auto E", true)
+LeeSinMenu.Misc:Slider("AutoECount", "if Enemies Around >", 3, 1, 5, 1)
 
 LeeSinMenu:Menu("Drawings", "Drawings")
 LeeSinMenu.Drawings:Boolean("Q", "Draw Q Range", true)
 LeeSinMenu.Drawings:Boolean("W", "Draw W Range", true)
 LeeSinMenu.Drawings:Boolean("E", "Draw E Range", true)
 LeeSinMenu.Drawings:Boolean("R", "Draw R Range", true)
-LeeSinMenu.Drawings:Boolean("EQ", "Draw EQ Range", true)
 
 LeeSinMenu.Drawings:ColorPick("color", "Color Picker", {255,255,255,0})
 
-local InterruptMenu = MenuConfig("Interrupt (W)", "Interrupt")
+local InterruptMenu = MenuConfig("Interrupt (R)", "Interrupt")
 
 DelayAction(function()
   local str = {[_Q] = "Q", [_W] = "W", [_E] = "E", [_R] = "R"}
@@ -65,7 +62,6 @@ if LeeSinMenu.Drawings.Q:Value() then DrawCircle(pos,275,1,50,col) end
 if LeeSinMenu.Drawings.W:Value() then DrawCircle(pos,260,1,50,col) end
 if LeeSinMenu.Drawings.E:Value() then DrawCircle(pos,250,1,50,col) end
 if LeeSinMenu.Drawings.R:Value() then DrawCircle(pos,1100,1,0,col) end
-if LeeSinMenu.Drawings.EQ:Value() then DrawCircle(pos,525,1,0,col) end
 end)
 
 OnTick(function(myHero)
@@ -73,37 +69,37 @@ OnTick(function(myHero)
 	local target = GetCurrentTarget()
 	
 	if IOW:Mode() == "Combo" then
-	  if IsReady(_E) and LeeSinMenu.Combo.E:Value() and ValidTarget(target, 440) and GetDistance(target) > GetRange(myHero)+GetHitBox(myHero) then
-	  CastSkillShot(_E, GetOrigin(target))
+	  if IsReady(_W) and LeeSinMenu.Combo.W:Value() and ValidTarget(target, 300) and GetDistance(target) > GetRange(myHero)+GetHitBox(myHero) then
+	  CastSkillShot(_W, GetOrigin(target))
 	  end
 	  
 	  if IsReady(_Q) and IsReady(_E) and LeeSinMenu.Combo.Q:Value() and LeeSinMenu.Combo.E:Value() and ValidTarget(target, 715) and GetDistance(target) > GetRange(myHero)+GetHitBox(target) then
 	  CastSkillShot(_E, GetOrigin(target))
-	  DelayAction(function() CastSkillShot(_Q, GetOrigin(target)) end, 267)
+	  DelayAction(function() CastSkillShot(_Q, GetOrigin(target)) end, 800)
 	  end
 	end
 	
 	if IOW:Mode() == "Harass" then
-	  if IsReady(_E) and LeeSinMenu.Harass.E:Value() and ValidTarget(target, 440) and GetDistance(target) > GetRange(myHero)+GetHitBox(myHero) then
-	  CastSkillShot(_E, GetOrigin(target))
+	  if IsReady(_W) and LeeSinMenu.Harass.W:Value() and ValidTarget(target, 300) and GetDistance(target) > GetRange(myHero)+GetHitBox(myHero) then
+	  CastSkillShot(_W, GetOrigin(target))
 	  end
 	  
 	  if IsReady(_Q) and IsReady(_E) and LeeSinMenu.Harass.Q:Value() and LeeSinMenu.Harass.E:Value() and ValidTarget(target, 715) and GetDistance(target) > GetRange(myHero)+GetHitBox(myHero)*3 then
 	  CastSkillShot(_E, GetOrigin(target))
-	  DelayAction(function() CastSkillShot(_Q, GetOrigin(target)) end, 267)
+	  DelayAction(function() CastSkillShot(_Q, GetOrigin(target)) end, 800)
 	  end
 	end
 
-	if IsReady(_W) and LeeSinMenu.Misc.AutoW:Value() and EnemiesAround2(GetOrigin(myHero),260,267) >= LeeSinMenu.Misc.AutoWCount:Value() then
-	CastSpell(_W)
+	if IsReady(_E) and LeeSinMenu.Misc.AutoE:Value() and EnemiesAround2(GetOrigin(myHero),260,267) >= LeeSinMenu.Misc.AutoWCount:Value() then
+	CastSpell(_E)
 	end
 	
 	if LeeSinMenu.Misc.Flee:Value() then
           MoveToXYZ(mousePos)
-          if IsReady(_E) then
-          CastSkillShot(_E, mousePos)
+          if IsReady(_W) then
+          CastSkillShot(_W, mousePos)
           end
-          if not IsReady(_E) and IsReady(_Q) and lastE + 350 < GetTickCount() then
+          if not IsReady(_W) and IsReady(_Q) and lastE + 350 < GetTickCount() then
           CastSkillShot(_Q, mousePos)
           end
         end
@@ -114,14 +110,6 @@ OnTick(function(myHero)
           if QCast < 2 and CanUseSpell(myHero, _Q) ~= ONCOOLDOWN then
           CastSkillShot(_Q, mousePos)
           end
-          if not MapPosition:inWall(movePos1) then
-            MoveToXYZ(mousePos)
-          else
-            if not MapPosition:inWall(movePos2) and CanUseSpell(myHero, _Q) ~= ONCOOLDOWN then
-            CastSkillShot(_Q, movePos2)
-            end
-          end
-	end
 	
 	for i,enemy in pairs(GetEnemyHeroes()) do
     	
@@ -131,8 +119,8 @@ OnTick(function(myHero)
             end
           end
                 
-  	  if IsReady(_W) and ValidTarget(enemy, 260) and LeeSinMenu.Killsteal.W:Value() and GetHP(enemy) < getdmg("W",enemy) then
-  	  CastSpell(_W)
+  	  if IsReady(_E) and ValidTarget(enemy, 260) and LeeSinMenu.Killsteal.E:Value() and GetHP(enemy) < getdmg("E",enemy) then
+  	  CastSpell(_E)
 	  elseif IsReady(_R) and GetCastName(myHero, _R) ~= "LeeSinFengShuiEngine" and ValidTarget(enemy, 1100) and LeeSinMenu.Killsteal.R:Value() and GetHP(enemy) < getdmg("R",enemy) then
 	  Cast(_R,enemy)
           end
@@ -153,10 +141,10 @@ end
 end)
 
 OnProcessSpell(function(unit,spell)
-  if GetObjectType(unit) == Obj_AI_Hero and GetTeam(unit) ~= GetTeam(myHero) and IsReady(_W) then
+  if GetObjectType(unit) == Obj_AI_Hero and GetTeam(unit) ~= GetTeam(myHero) and IsReady(_E) then
     if CHANELLING_SPELLS[spell.name] then
       if ValidTarget(unit, 260) and GetObjectName(unit) == CHANELLING_SPELLS[spell.name].Name and InterruptMenu[GetObjectName(unit).."Inter"]:Value() then 
-      CastSpell(_W)
+      CastSpell(_E)
       end
     end
   end
@@ -295,4 +283,4 @@ OnRemoveBuff(function(unit,buff)
   end
 end)
 
-AddGapcloseEvent(_R, 260, false)
+AddGapcloseEvent(_R, 375, false)
